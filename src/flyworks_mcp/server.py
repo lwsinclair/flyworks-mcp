@@ -407,6 +407,7 @@ async def wait_for_avatar_creation(task_id: str, timeout: int = 600, interval: i
     Returns:
     - If async_mode is true: task_id for checking status later
     - If async_mode is false: downloaded video path and task result
+    - If download fails: error message, task_id, task_result, and video_url for manual download
     """
 )
 async def create_lipsync_video_by_audio(
@@ -521,7 +522,14 @@ async def create_lipsync_video_by_audio(
             # Download the video
             download_result = await download_video(video_url, output_path)
             if "error" in download_result:
-                return download_result
+                # 如果下载失败，仍然返回视频URL
+                return {
+                    "error": download_result["error"],
+                    "video_url": video_url,
+                    "task_id": task_id,
+                    "task_result": task_result,
+                    "message": "Video download failed, but you can manually download it using the provided video_url"
+                }
             
             # Return success response
             result = {
@@ -565,6 +573,7 @@ async def create_lipsync_video_by_audio(
     Returns:
     - If async_mode is true: task_id for checking status later, selected voice ID
     - If async_mode is false: downloaded video path, task result, and selected voice ID
+    - If download fails: error message, task_id, task_result, video_url, and selected voice ID for manual download
     """
 )
 async def create_lipsync_video_by_text(
@@ -689,7 +698,15 @@ async def create_lipsync_video_by_text(
             # Download the video
             download_result = await download_video(video_url, output_path)
             if "error" in download_result:
-                return download_result
+                # 如果下载失败，仍然返回视频URL
+                return {
+                    "error": download_result["error"],
+                    "video_url": video_url,
+                    "task_id": task_id,
+                    "task_result": task_result,
+                    "selected_voice": voice,
+                    "message": "Video download failed, but you can manually download it using the provided video_url"
+                }
             
             # Return success response
             result = {
